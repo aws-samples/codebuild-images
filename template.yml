@@ -1,0 +1,40 @@
+Description: >
+  Creates AWS CodeCommit and Amazon ECR repositories for running AWS CodeBuild
+  customer build environment samples.
+
+Parameters:
+  EnvName:
+    Type: String
+    Description: Name of the CodeBuild environment (e.g. php, elixir, perl)
+    AllowedPattern: "[a-z0-9\\-]+"
+
+Resources:
+  BuildImageRepository:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName: !Sub "codebuild/${EnvName}"
+      RepositoryPolicyText:
+        Version: 2008-10-17
+        Statement:
+          - Action:
+              - ecr:BatchCheckLayerAvailability
+              - ecr:BatchGetImage
+              - ecr:GetDownloadUrlForLayer
+            Effect: Allow
+            Principal:
+              AWS:
+                - arn:aws:iam::201349592320:root
+                - arn:aws:iam::570169269855:root
+                - arn:aws:iam::964771811575:root
+
+  SourceCodeRepository:
+    Type: AWS::CodeCommit::Repository
+    Properties:
+      RepositoryName: !Sub "codebuild-sample-${EnvName}"
+
+Outputs:
+  BuildImageRepositoryUri:
+    Value: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${BuildImageRepository}"
+
+  SourceCodeRepositoryCloneUrl:
+    Value: !GetAtt SourceCodeRepository.CloneUrlHttp
