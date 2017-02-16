@@ -11,6 +11,7 @@ Parameters:
 Resources:
   BuildImageRepository:
     Type: AWS::ECR::Repository
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub "codebuild/${EnvName}"
       RepositoryPolicyText:
@@ -29,6 +30,7 @@ Resources:
 
   SourceCodeRepository:
     Type: AWS::CodeCommit::Repository
+    DeletionPolicy: Retain
     Properties:
       RepositoryName: !Sub "codebuild-sample-${EnvName}"
 
